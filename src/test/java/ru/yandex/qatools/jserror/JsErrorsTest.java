@@ -19,7 +19,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 @RunWith(Parameterized.class)
-public class JsErrors {
+public class JsErrorsTest {
     private String url;
     private static ProxyServer proxy;
     private WebDriver driver;
@@ -37,7 +37,7 @@ public class JsErrors {
         return caps;
     }
     
-    public JsErrors(String url) {
+    public JsErrorsTest(String url) {
     	this.url = url;
     }
     
@@ -52,6 +52,7 @@ public class JsErrors {
     @Test
     public void shoudNotAppear() throws IOException {
     	driver = new HtmlUnitDriver(getCaps());
+    	driver.get(url);
         List<String> errors = OnErrorHandler.getCurrentErrors(driver);
         assertThat("Detected " + errors.size() + " js-errors:" + collectErrorMessages(errors),
         		errors.size(), equalTo(0));
