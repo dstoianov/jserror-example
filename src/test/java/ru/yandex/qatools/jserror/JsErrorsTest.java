@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.browsermob.proxy.ProxyServer;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,18 +25,13 @@ public class JsErrorsTest {
     private String url;
     private static ProxyServer proxy;
     private WebDriver driver;
+    private static DesiredCapabilities caps;
     
     @Parameterized.Parameters
     public static Collection<String[]> data() {
     	List<String[]> urls = new ArrayList<String[]>();
     	urls.add(new String[]{"http://www.yandex.com"});
     	return urls;
-    }
-    
-    private static DesiredCapabilities getCaps() throws IOException {
-        DesiredCapabilities caps = new DesiredCapabilities("firefox", "", Platform.ANY);
-        caps.setJavascriptEnabled(true);
-        return caps;
     }
     
     public JsErrorsTest(String url) {
@@ -46,12 +43,14 @@ public class JsErrorsTest {
         proxy = new ProxyServer(0);
         proxy.start();
         ScriptInjection.injectScriptRightAfterHeadTag(proxy, OnErrorHandler.SCRIPT);
-        ScriptInjection.addProxyToCapabilities(getCaps(), proxy.seleniumProxy());
+        caps = new DesiredCapabilities("firefox", "", Platform.ANY);
+        caps.setJavascriptEnabled(true);
+        ScriptInjection.addProxyToCapabilities(caps, proxy.seleniumProxy());
     }
     
     @Test
     public void shoudNotAppear() throws IOException {
-    	driver = new HtmlUnitDriver(getCaps());
+    	driver = new HtmlUnitDriver(caps);
     	driver.get(url);
         List<String> errors = OnErrorHandler.getCurrentErrors(driver);
         assertThat("Detected " + errors.size() + " js-errors:" + collectErrorMessages(errors),
@@ -64,5 +63,16 @@ public class JsErrorsTest {
             message.append("[").append(error).append("]");
         }
         return message.toString();
+    }
+    
+    @After
+    public void stopDriver() {
+    	driver.close();
+    	driver.quit();
+    }
+    
+    @AfterClass
+    public static void stopProxy() throws Exception {
+    	proxy.stop();
     }
 }
