@@ -1,27 +1,21 @@
 package ru.yandex.qatools.jserror;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import com.opera.core.systems.OperaProfile;
-
+import net.lightbody.bmp.proxy.ProxyServer;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.protocol.HttpContext;
-import org.browsermob.proxy.ProxyServer;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class ScriptInjection {
     private static final String HEAD = "<head>";
@@ -38,12 +32,12 @@ public class ScriptInjection {
             switches.add("--proxy-server=" + proxy.getHttpProxy());
             caps.setCapability("chrome.switches", switches);
         }
-        if ("opera".equals(caps.getBrowserName())) {
+/*        if ("opera".equals(caps.getBrowserName())) {
             OperaProfile profile = new OperaProfile();
             profile.preferences().set("Proxy", "HTTP server", proxy.getHttpProxy());
             profile.preferences().set("Proxy", "Use HTTP", "1");
             caps.setCapability("opera.profile", profile);
-        }
+        }*/
     }
 
     public static void injectScriptRightAfterHeadTag(ProxyServer proxy, final String script) throws Exception {
